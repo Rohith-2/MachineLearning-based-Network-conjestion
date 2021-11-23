@@ -5,7 +5,6 @@ import math
 import random
 from pycaret.regression import *
 import numpy as np
-from sklearn.preprocessing import PolynomialFeatures
 
 import context
 from src.device import Device, Device_Type
@@ -33,7 +32,7 @@ class HostML(Device):
         self.tcp = TCPML()
         self.def_seg_no = 1
 
-        model_path = os.path.join('model/model.pickle')   
+        #model_path = os.path.join('model/model.pickle')   
         self.model = load_model('model/best-model')
     
     def link(self,other:Device):
