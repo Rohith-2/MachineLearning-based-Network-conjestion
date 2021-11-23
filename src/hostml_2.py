@@ -15,8 +15,8 @@ class TCPML():
         self.packets_to_send = list()
         self.packets_in_flight = list()
         self.pckts_to_resend = list()
-        #self.window_size = random.randint(1,10)
-        self.window_size = 1
+        self.window_size = random.randint(1,10)
+        #self.window_size = 1
         self.timeout = 10
 
         self.ack_recv_flag = False
