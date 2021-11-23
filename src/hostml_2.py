@@ -167,4 +167,3 @@ class HostML(Device):
 if __name__ == "__main__":
     h = HostML("1")
     h.step()
-    print("hello github desk")
