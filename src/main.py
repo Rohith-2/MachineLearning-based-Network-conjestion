@@ -25,12 +25,14 @@ net.generate_forwarding_table_entries()
 
 for i in range(500):
     net.hosts["1"].send_random_packet(net.hosts["2"])
-
-for i in range(500):
-   net.hosts["3"].send_random_packet(net.hosts["4"])
-
-for i in range(500):
+    net.hosts["3"].send_random_packet(net.hosts["4"])
     net.hosts["6"].send_random_packet(net.hosts["7"])
+
+# for i in range(500):
+#    net.hosts["3"].send_random_packet(net.hosts["4"])
+
+# for i in range(500):
+#     net.hosts["6"].send_random_packet(net.hosts["7"])
 
 window_data = list()
 

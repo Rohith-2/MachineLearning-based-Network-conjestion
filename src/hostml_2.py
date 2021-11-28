@@ -15,8 +15,8 @@ class TCPML():
         self.packets_to_send = list()
         self.packets_in_flight = list()
         self.pckts_to_resend = list()
-        self.window_size = random.randint(1,10)
-        #self.window_size = 1
+        #self.window_size = random.randint(1,300)
+        self.window_size = 1
         self.timeout = 10
 
         self.ack_recv_flag = False
@@ -134,6 +134,7 @@ class HostML(Device):
             self.tcp.ack_timeout_flag
         ]])
 
+        print(model_input)
         model_output = self.model.predict(pd.DataFrame(model_input,columns=['window_size', 'ack_received', 'ack_timeout']))
 
         self.tcp.window_size = int(model_output[0])

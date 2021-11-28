@@ -33,7 +33,6 @@ class HostML(Device):
 
         model_path = os.path.join(os.path.dirname(__file__),os.pardir,'model/model.pickle')   
         self.model = pickle.load(open(model_path,'rb'))
-
         self.poly_features = PolynomialFeatures(degree=2,interaction_only=True)
     
     def link(self,other:Device):
@@ -135,7 +134,7 @@ class HostML(Device):
             self.tcp.ack_timeout_flag
         ]], dtype=np.float32)
 
-        #model_input = self.poly_features.fit_transform(model_input)
+        model_input = self.poly_features.fit_transform(model_input)
         model_output = self.model.predict(model_input)
 
         self.tcp.window_size = int(model_output[0])

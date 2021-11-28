@@ -1,7 +1,7 @@
 import numpy as np
 import os.path
 import pickle
-from sklearn.linear_model import BayesianRidge
+from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 
 file_path = os.path.join(os.path.dirname(__file__),os.pardir,'data/tcp_data.csv')
@@ -10,17 +10,12 @@ X = np.loadtxt(file_path,delimiter=',',skiprows=1,usecols=(0,1,2))
 Y = np.loadtxt(file_path,delimiter=',',skiprows=1,usecols=(3))
 
 poly_features = PolynomialFeatures(degree=2,interaction_only=True)
-#X_poly = poly_features.fit_transform(X)
-print(X.shape)
+X_poly = poly_features.fit_transform(X)
 
-lr = BayesianRidge(alpha_1=1e-06, alpha_2=1e-06, alpha_init=None,
-                                compute_score=False, copy_X=True,
-                                fit_intercept=True, lambda_1=1e-06,
-                                lambda_2=1e-06, lambda_init=None, n_iter=300,
-                                normalize=False, tol=0.001, verbose=False)
-lr.fit(X,Y)
+lr = LinearRegression()
+lr.fit(X_poly,Y)
 
-Y_pred = lr.predict(X)
+Y_pred = lr.predict(X_poly)
 train_err = np.mean(np.abs(Y-Y_pred))
 print("Training completed.")
 print("Loss:",train_err)
@@ -38,9 +33,9 @@ print("Testing on data:")
 print(testX)
 print()
 
-#testX_poly = poly_features.fit_transform(testX[0])
+testX_poly = poly_features.fit_transform(testX)
 
-test_pred = lr.predict(testX)
+test_pred = lr.predict(testX_poly)
 
 print("Predictions:")
 print(test_pred)
