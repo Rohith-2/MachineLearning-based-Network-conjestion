@@ -65,42 +65,42 @@ class HostML(Device):
     def step(self):
         super().step()
 
-        self.tcp.ack_recv_flag = False
+        self.tcp.ack_recv_flag = False     
         self.tcp.ack_timeout_flag = False
 
         # handle incoming packets
-        for pckt in self.incoming_buffer:
-            if pckt.get_pckt_type() == Packet_Type.DATA:
+        for pckt in self.incoming_buffer:      # iterating through the packets in incoming buffer
+            if pckt.get_pckt_type() == Packet_Type.DATA:  # checking for data 
                 # send ack packet
-                ack_pack = Packet(pckt.get_seg_no(),pckt.get_to(),pckt.get_from(),Packet_Type.ACK)
-                self.outgoing_buffer.append(ack_pack)
+                ack_pack = Packet(pckt.get_seg_no(),pckt.get_to(),pckt.get_from(),Packet_Type.ACK) # instantiating ACK pkt
+                self.outgoing_buffer.append(ack_pack)  # appending ACKs into outgoing buffer
                 # print("Host {} received packet {} from host {} and sent ACK.".format(self.get_ip(), pckt.get_seg_no(), pckt.get_from().get_ip()))
                 pass
             
-            elif pckt.get_pckt_type() == Packet_Type.ACK:
+            elif pckt.get_pckt_type() == Packet_Type.ACK:  # checking if pkt is ACK pkt
                 # remove packet from packets in flight and packets to send
-                seg_no = pckt.get_seg_no()
+                seg_no = pckt.get_seg_no() # storing current ptkt's seg_no
                 
                 index = -1
-                for i in range(len(self.tcp.packets_in_flight)):
+                for i in range(len(self.tcp.packets_in_flight)): # iterating through pkts in flight
                     pckt2 = self.tcp.packets_in_flight[i][0]
-                    if pckt2.get_seg_no() == seg_no:
-                        index = i
+                    if pckt2.get_seg_no() == seg_no:  # checks for current pkt 
+                        index = i             # index = 1 if current pkt is found
                         break
                 
                 if index >= 0:
                     self.tcp.timeout = self.clock-self.tcp.packets_in_flight[i][1]     # set tcp timeout adaptively
-                    self.tcp.packets_in_flight.pop(index)
+                    self.tcp.packets_in_flight.pop(index) # pop pkt from pkt_in_flight
                 
                 index = -1
-                for i in range(len(self.tcp.packets_to_send)):
+                for i in range(len(self.tcp.packets_to_send)): # iterating through pkts_to_send to find current pkt
                     pckt2 = self.tcp.packets_to_send[i]
                     if pckt2.get_seg_no() == seg_no:
-                        index = i
+                        index = i    #update index if found
                         break
                 
                 if index >= 0:
-                    self.tcp.packets_to_send.pop(index)
+                    self.tcp.packets_to_send.pop(index) # pop it from the pkts_to_send
                 
                 # print("Host {} received ACK from host {}.".format(self.get_ip(), pckt.get_from().get_ip()))
                 self.tcp.ack_recv_flag = True
@@ -109,24 +109,25 @@ class HostML(Device):
         self.incoming_buffer.clear()
 
         # resend any timed out packets
-        for i in range(len(self.tcp.packets_in_flight)):
-            pckt,t = self.tcp.packets_in_flight[i]
-            if self.clock - t> self.tcp.timeout:
-                self.tcp.pckts_to_resend.append(i)
+        for i in range(len(self.tcp.packets_in_flight)): # iterates through remaining pkts in flight
+            pckt,t = self.tcp.packets_in_flight[i] 
+            if self.clock - t> self.tcp.timeout:   # if time lived exceeds timeout pkt must be resent
+                self.tcp.pckts_to_resend.append(i) # append pkt in pkt_to_resend
         
-        for i in self.tcp.pckts_to_resend:
-            pckt = self.tcp.packets_in_flight[i][0]
-            self.tcp.packets_to_send.insert(0,pckt)
+        for i in self.tcp.pckts_to_resend:          # iterates through pkts_to_resend
+            pckt = self.tcp.packets_in_flight[i][0]     
+            self.tcp.packets_to_send.insert(0,pckt) # inserts pkts to pkts_to_send
             # print("Host {} resending packet {} due to timeout.".format(self.get_ip(),pckt.get_seg_no()))
             pass
         
         for i in sorted(self.tcp.pckts_to_resend,reverse=True):
-            del self.tcp.packets_in_flight[i]
+            del self.tcp.packets_in_flight[i]       # insert pkts sent to pkts_in_flight
 
         # reset window size and ssthresh in case of timeout
-        if len(self.tcp.pckts_to_resend) > 0:
-            self.tcp.ack_timeout_flag = True
-
+        if len(self.tcp.pckts_to_resend) > 0:  # if length of pkts to be sent>0
+            self.tcp.ack_timeout_flag = True   # ACK Timeout flag is set to true
+            
+        # Using the calculated values for prediction
         # predict new window size using model
         model_input = np.array([[
             self.tcp.window_size,
