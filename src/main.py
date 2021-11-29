@@ -39,6 +39,9 @@ window_data = list()
 print("Testing using 3 hosts.")
 print("Sending 1500 packets over the network.")
 print("Running the simulation for 500 steps.")
+window_net_1 = []
+window_net_3 = []
+window_net_6 = []
 
 for i in range(515):
     net.step()
@@ -48,6 +51,10 @@ for i in range(515):
         net.hosts["3"].tcp.window_size,
         net.hosts["6"].tcp.window_size
     ])
+
+    window_net_1.append(net.hosts["1"].tcp.window_size)
+    window_net_3.append(net.hosts["3"].tcp.window_size)
+    window_net_6.append(net.hosts["6"].tcp.window_size)
 
 window_data = np.array(window_data)
 
@@ -60,8 +67,11 @@ print(np.mean(window_data,axis=0))
 
 plt.figure(figsize=(15,5))
 plt.plot(window_data)
+# plt.plot(window_net_1,marker='*')
+# plt.plot(window_net_3,linestyle='-')
+# plt.plot(window_net_6,linestyle='--')
 plt.title("Window Size")
 plt.xlabel("tick")
 plt.ylabel("window_size")
-plt.legend(['host1','host2','host3'])
+plt.legend(['host1','host2'])#,'host3'])
 plt.show()

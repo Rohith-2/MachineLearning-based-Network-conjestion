@@ -34,6 +34,7 @@ class HostML(Device):
 
         #model_path = os.path.join('model/model.pickle')   
         self.model = load_model('model/best-model')
+        print(self.model)
     
     def link(self,other:Device):
         self.connected_router = other
@@ -134,7 +135,6 @@ class HostML(Device):
             self.tcp.ack_timeout_flag
         ]])
 
-        print(model_input)
         model_output = self.model.predict(pd.DataFrame(model_input,columns=['window_size', 'ack_received', 'ack_timeout']))
 
         self.tcp.window_size = int(model_output[0])
